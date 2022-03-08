@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 #define int long long
 using namespace std;
- 
+
 void IOS()
 {
 #ifndef ONLINE_JUDGE
@@ -10,35 +10,37 @@ void IOS()
 #endif
     ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
 }
- 
+
 const int MX = 100005;
 vector<int> adj[MX];
 vector<bool> vis(MX, false);
-vector<int> order;
- 
-bool dfs(int u, int p = -1)
+vector<int> parent(MX, -1);
+int sv, ev;
+
+bool dfs(int u, int par)
 {
     vis[u] = true;
-    order.push_back(u);
+    parent[u] = par;
     for (int to : adj[u])
     {
-        if (to == p)
+        if (to == par)
             continue;
-        else if (vis[to])
-        {
-            order.push_back(to);
-            return true;
-        }
-        else
+        else if (!vis[to])
         {
             if (dfs(to, u))
                 return true;
         }
+        else if (to != par)
+        {
+            sv = to;
+            ev = u;
+            return true;
+        }
     }
-    order.pop_back();
+
     return false;
 }
- 
+
 void solve()
 {
     int n, m;
@@ -50,36 +52,34 @@ void solve()
         adj[a].push_back(b);
         adj[b].push_back(a);
     }
- 
-    int flag = 0;
+
     for (int i = 1; i <= n; i++)
     {
         if (!vis[i])
         {
-            if (dfs(i))
+            if (dfs(i, -1))
             {
-                flag = 1;
-                break;
+                vector<int> ans;
+                ans.push_back(ev);
+                int tv = ev;
+                while (tv != sv)
+                {
+                    ans.push_back(parent[tv]);
+                    tv = parent[tv];
+                }
+                ans.push_back(ev);
+                cout << ans.size() << endl;
+                for (int x : ans)
+                    cout << x << " ";
+                return;
             }
         }
     }
-    if (flag)
-    {
-        vector<int> ans;
-        int n = order.size();
-        ans.push_back(order[n - 1]);
-        int ind = n - 2;
-        while (order[ind] != order[n - 1])
-            ans.push_back(order[ind]), ind--;
-        ans.push_back(order[ind]);
-        cout << ans.size() << endl;
-        for (int v : ans)
-            cout << v << " ";
-    }
-    else cout << "IMPOSSIBLE";
+
+    cout << "IMPOSSIBLE";
     cout << endl;
 }
- 
+
 int32_t main()
 {
     IOS();
